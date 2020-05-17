@@ -1,0 +1,5 @@
+<resources>
+	<string name="app_name">WhereAreYou</string>
+	<string name="tab_text_1">Record</string>
+	<string name="tab_text_2">Map</string>
+</resources>

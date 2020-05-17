@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mapLayout"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:gravity="center"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Map information"
+        android:layout_marginBottom="2dp"
+        />
+    <TextView
+        android:id="@+id/mapInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/back"
+        android:paddingHorizontal="10dp"
+        android:paddingVertical="6dp"
+        android:lines="4"
+        android:scrollHorizontally="true"
+        android:text="Click 'Map Control' to fetch new data"
+        />
+    <Button
+        android:id="@+id/buttonMapControl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Map control" />
+
+    <FrameLayout
+        android:layout_marginTop="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:id="@+id/mapFragment" />
+</LinearLayout>
