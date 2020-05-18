@@ -30,6 +30,7 @@ import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONArrayRequestListener;
 import com.example.whereareyou.R;
+import com.example.whereareyou.Utils;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -203,6 +204,7 @@ public class MapFragment extends Fragment
 
   @SuppressLint("SetTextI18n")
   private void updateMap() {
+    Log.d(TAG, "Authentication: " + Utils.getAuthentication(getActivity()));
     SimpleDateFormat formatter = new SimpleDateFormat(DATE_TIME_FORMAT, Locale.US);
     Date startDate = new Date();
     Date endDate = new Date();
@@ -249,7 +251,7 @@ public class MapFragment extends Fragment
         currentDataCount++;
         // Data is recorded within selected time range
         LatLng loc = new LatLng(latitude, longitude);
-        googleMap.addMarker(new MarkerOptions().position(loc).title("marker"));
+        googleMap.addMarker(new MarkerOptions().position(loc));
         lastLoc = loc;
       }
     }

@@ -1,18 +1,16 @@
 package com.example.whereareyou;
 
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.Log;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
 
-import androidx.annotation.Nullable;
-import androidx.viewpager.widget.ViewPager;
-import androidx.appcompat.app.AppCompatActivity;
-
 public class MainActivity extends AppCompatActivity {
+    private static final String TAG = "MyDebug";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,20 +23,5 @@ public class MainActivity extends AppCompatActivity {
 
         TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
-
-        // Bundle extras = getIntent().getExtras();
-        // if ( extras != null ) {
-        //     interval = extras.getInt("interval");
-        // }
     }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
-
-    //
-    // public int getInterval() {
-    //     return interval;
-    // }
 }
