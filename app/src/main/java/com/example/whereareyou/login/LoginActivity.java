@@ -14,6 +14,7 @@ import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
+import com.androidnetworking.interfaces.OkHttpResponseListener;
 import com.example.whereareyou.MainActivity;
 import com.example.whereareyou.R;
 import com.example.whereareyou.Utils;
@@ -21,6 +22,8 @@ import com.google.android.material.textfield.TextInputEditText;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import okhttp3.Response;
 
 public class LoginActivity extends AppCompatActivity
   implements RegisterDialog.OnRegisterListener {
@@ -107,26 +110,43 @@ public class LoginActivity extends AppCompatActivity
     } catch (JSONException e) {
       e.printStackTrace();
     }
-    // AndroidNetworking.post(getString(R.string.api_root)+"user")
-    //     .addJSONObjectBody(postBody)
-    //     .setTag("postUserLogin")
-    //     .setPriority(Priority.MEDIUM)
-    //     .build()
-    //     .getAsJSONObject(new JSONObjectRequestListener() {
-    //       @Override
-    //       public void onResponse(JSONObject response) {
-    //         // Register ok (200)
-    //         Utils.setAuthentication(LoginActivity.this, username, password);
-    //         login();
-    //       }
-    //       @Override
-    //       public void onError(ANError error) {
-    //         usernameLoginInput.setError("Failed to register username");
-    //         passwordLoginInput.setError("Failed to register password");
-    //       }
-    //     });
-    Utils.setAuthentication(LoginActivity.this, username, password);
-    login();
+    AndroidNetworking.post(getString(R.string.api_root)+"user")
+        // .addJSONObjectBody(postBody)
+        .addBodyParameter("username", username)
+        .addBodyParameter("password", password)
+        .setTag("postUserRegister")
+        .setPriority(Priority.MEDIUM)
+        .build()
+        .getAsOkHttpResponse(new OkHttpResponseListener() {
+          @Override
+          public void onResponse(Response response) {
+            Log.d(TAG, "onResponse: " + response.toString());
+            Utils.setAuthentication(LoginActivity.this, username, password);
+            login();
+          }
+          @Override
+          public void onError(ANError error) {
+            error.printStackTrace();
+            usernameLoginInput.setError("Failed to register username", null);
+            passwordLoginInput.setError("Failed to register password", null);
+          }
+        });
+        // .getAsJSONObject(new JSONObjectRequestListener() {
+        //   @Override
+        //   public void onResponse(JSONObject response) {
+        //     // Register ok (200)
+        //     Utils.setAuthentication(LoginActivity.this, username, password);
+        //     login();
+        //   }
+        //   @Override
+        //   public void onError(ANError error) {
+        //     error.printStackTrace();
+        //     usernameLoginInput.setError("Failed to register username", null);
+        //     passwordLoginInput.setError("Failed to register password", null);
+        //   }
+        // });
+    // Utils.setAuthentication(LoginActivity.this, username, password);
+    // login();
   }
 
   private void authorizeUser(final String username, final String password) {
@@ -137,26 +157,40 @@ public class LoginActivity extends AppCompatActivity
     } catch (JSONException e) {
       e.printStackTrace();
     }
-    Utils.setAuthentication(LoginActivity.this, username, password);
-    login();
-    // AndroidNetworking.post(getString(R.string.api_root)+"user/login")
-    //     .addJSONObjectBody(postBody)
-    //     .setTag("postUserLogin")
-    //     .setPriority(Priority.MEDIUM)
-    //     .build()
-    //     .getAsJSONObject(new JSONObjectRequestListener() {
-    //       @Override
-    //       public void onResponse(JSONObject response) {
-    //         // Login ok (200)
-    //         Utils.setAuthentication(LoginActivity.this, username, password);
-    //         login();
-    //       }
-    //       @Override
-    //       public void onError(ANError error) {
-    //         usernameLoginInput.setError("Failed to authorize username");
-    //         passwordLoginInput.setError("Failed to authorize password");
-    //       }
-    //     });
+    // Utils.setAuthentication(LoginActivity.this, username, password);
+    // login();
+    AndroidNetworking.post(getString(R.string.api_root)+"user/login")
+        // .addJSONObjectBody(postBody)
+        .addBodyParameter("username", username)
+        .addBodyParameter("password", password)
+        .setTag("postUserLogin")
+        .setPriority(Priority.MEDIUM)
+        .build()
+        .getAsOkHttpResponse(new OkHttpResponseListener() {
+          @Override
+          public void onResponse(Response response) {
+            Utils.setAuthentication(LoginActivity.this, username, password);
+            login();
+          }
+          @Override
+          public void onError(ANError anError) {
+            usernameLoginInput.setError("Failed to authorize username");
+            passwordLoginInput.setError("Failed to authorize password");
+          }
+        });
+        // .getAsJSONObject(new JSONObjectRequestListener() {
+        //   @Override
+        //   public void onResponse(JSONObject response) {
+        //     // Login ok (200)
+        //     Utils.setAuthentication(LoginActivity.this, username, password);
+        //     login();
+        //   }
+        //   @Override
+        //   public void onError(ANError error) {
+        //     usernameLoginInput.setError("Failed to authorize username");
+        //     passwordLoginInput.setError("Failed to authorize password");
+        //   }
+        // });
   }
 
   private void login() {

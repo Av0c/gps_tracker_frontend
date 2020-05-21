@@ -181,24 +181,25 @@ public class MapFragment extends Fragment
 
   private void fetchData(String newUsername) {
     // API call to fetch data of username
-    // AndroidNetworking.get(getString(R.string.api_root)+"point/{username}")
-    //     .addPathParameter("username", newUsername)
-    //     .addHeaders("Authorization", "Basic dTE6cDE")
-    //     .setTag("getPoint")
-    //     .setPriority(Priority.MEDIUM)
-    //     .build()
-    //     .getAsJSONArray(new JSONArrayRequestListener() {
-    //       @Override
-    //       public void onResponse(JSONArray response) {
-    //         data = response;
-    //         updateMap();
-    //       }
-    //       @Override
-    //       public void onError(ANError error) {
-    //         // handle error
-    //         error.printStackTrace();
-    //       }
-    //     });
+    AndroidNetworking.get(getString(R.string.api_root)+"point/{username}")
+        .addPathParameter("username", newUsername)
+        .addHeaders("Authorization", "Basic " + Utils.getAuthentication(getActivity()))
+        .setTag("getPoint")
+        .setPriority(Priority.MEDIUM)
+        .build()
+        .getAsJSONArray(new JSONArrayRequestListener() {
+          @Override
+          public void onResponse(JSONArray response) {
+            Log.d(TAG, "Get locations success: " + response.toString());
+            data = response;
+            updateMap();
+          }
+          @Override
+          public void onError(ANError error) {
+            // handle error
+            error.printStackTrace();
+          }
+        });
     updateMap();
   }
 

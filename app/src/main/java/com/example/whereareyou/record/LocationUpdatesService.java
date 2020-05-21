@@ -21,6 +21,7 @@ import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
+import com.androidnetworking.interfaces.OkHttpResponseListener;
 import com.example.whereareyou.MainActivity;
 import com.example.whereareyou.R;
 import com.example.whereareyou.Utils;
@@ -37,6 +38,8 @@ import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import okhttp3.Response;
 
 /**
  * A bound and started service that is promoted to a foreground service when location updates have
@@ -241,7 +244,7 @@ public class LocationUpdatesService extends Service {
     }
   }
 
-  private void onNewLocation(Location location) {
+  private void onNewLocation(final Location location) {
     lastLocation = location;
 
     // Notify anyone listening for broadcasts about the new location.
@@ -257,30 +260,31 @@ public class LocationUpdatesService extends Service {
     // Log.d("MyDebug", "time     : " + format.format(new Date()));
     // Log.d("MyDebug", "diff (seconds): " + (location.getTime() - System.currentTimeMillis())/1000);
 
-    JSONObject postBody = new JSONObject();
-    try {
-      postBody.put("longitude", location.getLongitude());
-      postBody.put("latitude", location.getLatitude());
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
+    // JSONObject postBody = new JSONObject();
+    // try {
+    //   postBody.put("longitude", location.getLongitude());
+    //   postBody.put("latitude", location.getLatitude());
+    // } catch (JSONException e) {
+    //   e.printStackTrace();
+    // }
 
-    // AndroidNetworking.post(getString(R.string.api_root)+"point")
-    //     .addHeaders("Authorization", "Basic dTE6cDE=")
-    //     .addJSONObjectBody(postBody)
-    //     .setTag("postPoint")
-    //     .setPriority(Priority.MEDIUM)
-    //     .build()
-    //     .getAsJSONObject(new JSONObjectRequestListener() {
-    //       @Override
-    //       public void onResponse(JSONObject response) {
-    //         // do anything with response
-    //       }
-    //       @Override
-    //       public void onError(ANError error) {
-    //         // handle error
-    //       }
-    //     });
+    AndroidNetworking.post(getString(R.string.api_root)+"point")
+        .addHeaders("Authorization", "Basic " + Utils.getAuthentication(getApplicationContext()))
+        .addBodyParameter("longitude", String.valueOf(location.getLongitude()))
+        .addBodyParameter("latitude", String.valueOf(location.getLatitude()))
+        .setTag("postPoint")
+        .setPriority(Priority.MEDIUM)
+        .build()
+        .getAsOkHttpResponse(new OkHttpResponseListener() {
+          @Override
+          public void onResponse(Response response) {
+            Log.d(TAG, "Location submitted: " + location.toString());
+          }
+          @Override
+          public void onError(ANError anError) {
+            Log.d(TAG, "Failed to submit location: " + anError.getMessage());
+          }
+        });
 
     // Update notification content if running as a foreground service.
     if (isForeground) {
