@@ -26,6 +26,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.whereareyou.R;
 import com.example.whereareyou.Utils;
+import com.example.whereareyou.login.LoginActivity;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -42,8 +43,6 @@ import java.util.Objects;
 
 public class RecordFragment extends Fragment {
   private static final String TAG = "MyDebug";
-  private static final String CHANNEL_ID = "gpsChannel";
-  private static final int NOTIFICATION_ID = 1;
   private static final int REQUEST_LOCATION_SETTINGS = 7090;
   private static final int REQUEST_LOCATION_PERMISSIONS = 62475;
 
@@ -51,9 +50,7 @@ public class RecordFragment extends Fragment {
   private TextInputEditText intervalInput;
   private Button buttonStart;
   private Button buttonStop;
-
-  private static AlarmManager alarm;
-  private static LocationCallback locationCallback;
+  private Button buttonLogout;
 
   private LocationUpdatesService locationUpdatesService = null;
   private boolean serviceIsBound = false;
@@ -77,14 +74,6 @@ public class RecordFragment extends Fragment {
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    // createNotificationChannel();
-
-    // Restore interval values when app is started from notification
-    // Bundle bundle = getArguments();
-    // if (bundle != null) {
-    //   Log.d("MyDebug", "Interval: " + bundle.getString("interval"));
-    // }
-
     // Run this check if locations are tracking and app is started again
     // Check that the user hasn't revoked permissions by going to Settings.
     if (Utils.requestingLocationUpdates(getActivity())) {
@@ -105,6 +94,7 @@ public class RecordFragment extends Fragment {
     intervalInput = view.findViewById(R.id.intervalInput);
     buttonStart = view.findViewById(R.id.buttonStart);
     buttonStop = view.findViewById(R.id.buttonStop);
+    buttonLogout = view.findViewById(R.id.buttonLogout);
 
     // Bind actions to buttons
     buttonStart.setOnClickListener(
@@ -123,6 +113,13 @@ public class RecordFragment extends Fragment {
           }
         }
     );
+    buttonLogout.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        Intent intent = new Intent(getActivity(), LoginActivity.class);
+        startActivity(intent);
+      }
+    });
 
     // Set button/input states based on if locations are tracking
     setInputsState(Utils.requestingLocationUpdates(getActivity()));
@@ -172,7 +169,7 @@ public class RecordFragment extends Fragment {
     super.onResume();
     // Location permissions are only needed to be checked at onStart
 
-    Log.d(TAG, "onResume");
+    // Log.d(TAG, "onResume");
   }
 
   @Override
@@ -185,7 +182,7 @@ public class RecordFragment extends Fragment {
           // Permissions granted
           // Restart location updates if app is already set to run but somehow stopped
           // (Location permission revoked,...)
-          Log.d(TAG, "onRequestPermissionsResult: ");
+          // Log.d(TAG, "onRequestPermissionsResult: ");
           startService();
         } else {
           // Permissions denied, boo!
@@ -197,15 +194,15 @@ public class RecordFragment extends Fragment {
   public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
     super.onActivityResult(requestCode, resultCode, data);
     // Called when settings request is completed
-    Log.d(TAG, "onActivityResult: " + resultCode);
-    Log.d(TAG, "onActivityResult: " + Activity.RESULT_OK);
+    // Log.d(TAG, "onActivityResult: " + resultCode);
+    // Log.d(TAG, "onActivityResult: " + Activity.RESULT_OK);
     switch (requestCode) {
       case REQUEST_LOCATION_SETTINGS:
         if (resultCode == Activity.RESULT_OK) {
           // Settings are successfully configured
 
           // Since settings are only requested when the user has or trying to start the tracker
-          // So the service is always called
+          // So the service is always called again
           startService();
         } else {
           // User denied to change settings
@@ -252,12 +249,12 @@ public class RecordFragment extends Fragment {
             // Check location permissions next
             if (checkLocationPermission()) {
               // Permissions are ok
-              Log.d(TAG, "onSuccess");
+              // Log.d(TAG, "onSuccess");
               locationUpdatesService.startLocationUpdates();
               setInputsState(true); // Toggle input states
             } else {
               // Request permissions
-              Log.d(TAG, "onFailure permissions");
+              // Log.d(TAG, "onFailure permissions");
               requestLocationPermission();
             }
           }
@@ -266,7 +263,7 @@ public class RecordFragment extends Fragment {
         task.addOnFailureListener(getActivity(), new OnFailureListener() {
           @Override
           public void onFailure(@NonNull Exception e) {
-            Log.d(TAG, "onFailure settings");
+            // Log.d(TAG, "onFailure settings");
             if (e instanceof ResolvableApiException) {
               // Location settings are wrong but can be fixed (turned on)
               try {
@@ -282,27 +279,6 @@ public class RecordFragment extends Fragment {
             }
           }
         });
-
-        // Show notification
-        // Intent notificationIntent = new Intent(getContext(), MainActivity.class);
-        //
-        // notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        // notificationIntent.putExtra("interval", interval);
-        //
-        // PendingIntent pendingIntent = PendingIntent.getActivity(getContext(),
-        //     0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        //
-        // Notification notification = new NotificationCompat.Builder(getContext(), CHANNEL_ID)
-        //     .setContentTitle("GPS Service is running..")
-        //     .setContentText("Submitting coordinates every " + interval + " minutes")
-        //     .setSmallIcon(R.drawable.ic_gps)
-        //     .setContentIntent(pendingIntent)
-        //     .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-        //     .setOngoing(true)
-        //     .build();
-        //
-        // NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getContext());
-        // notificationManager.notify(NOTIFICATION_ID, notification);
       }
     }
   }
@@ -310,21 +286,6 @@ public class RecordFragment extends Fragment {
   private void stopService() {
     locationUpdatesService.stopLocationUpdates();
     setInputsState(false);
-    // Stop alarm
-    // Intent alarmIntent = new Intent(getContext(), AlarmReceiver.class);
-    // PendingIntent pendingAlarmIntent = PendingIntent.getBroadcast(getContext(), 0, alarmIntent, 0);
-    // alarm.cancel(pendingAlarmIntent);
-    // Log.d("MyDebug", "Alarm stopped from fragment.");
-    //
-    // // Cancel notification
-    // NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getContext());
-    // notificationManager.cancel(NOTIFICATION_ID);
-
-    // Intent serviceIntent = new Intent(this.getActivity(), GpsService.class);
-    // Objects.requireNonNull(getActivity())
-    //     .stopService(serviceIntent);
-    //
-    // Log.d("SERVICE", "Service stopped");
   }
 
   private boolean checkLocationPermission() {

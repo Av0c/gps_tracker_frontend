@@ -4,14 +4,12 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -19,21 +17,14 @@ import android.widget.DatePicker;
 import android.widget.TimePicker;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.example.whereareyou.R;
 import com.google.android.material.textfield.TextInputEditText;
 
-import java.util.Calendar;
-import java.util.Date;
-
 public class MapControlFragment extends DialogFragment {
   private static final String TAG = "MyDebug";
-
-  // Constants
-  public static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
   // Fragments communication
   private static final int DATE_PICKER_REQUEST = 123000;

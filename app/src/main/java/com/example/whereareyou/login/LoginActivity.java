@@ -10,10 +10,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 
 import com.androidnetworking.AndroidNetworking;
-;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
-import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.androidnetworking.interfaces.OkHttpResponseListener;
 import com.example.whereareyou.MainActivity;
 import com.example.whereareyou.R;
@@ -102,7 +100,7 @@ public class LoginActivity extends AppCompatActivity
 
   @Override
   public void onRegister(final String username, final String password) {
-    Log.d(TAG, "onRegister: " + username + ":" + password);
+    // Log.d(TAG, "onRegister: " + username + ":" + password);
     JSONObject postBody = new JSONObject();
     try {
       postBody.put("username", username);
@@ -111,7 +109,6 @@ public class LoginActivity extends AppCompatActivity
       e.printStackTrace();
     }
     AndroidNetworking.post(getString(R.string.api_root)+"user")
-        // .addJSONObjectBody(postBody)
         .addBodyParameter("username", username)
         .addBodyParameter("password", password)
         .setTag("postUserRegister")
@@ -120,7 +117,7 @@ public class LoginActivity extends AppCompatActivity
         .getAsOkHttpResponse(new OkHttpResponseListener() {
           @Override
           public void onResponse(Response response) {
-            Log.d(TAG, "onResponse: " + response.toString());
+            // Log.d(TAG, "onResponse: " + response.toString());
             Utils.setAuthentication(LoginActivity.this, username, password);
             login();
           }
@@ -131,22 +128,6 @@ public class LoginActivity extends AppCompatActivity
             passwordLoginInput.setError("Failed to register password", null);
           }
         });
-        // .getAsJSONObject(new JSONObjectRequestListener() {
-        //   @Override
-        //   public void onResponse(JSONObject response) {
-        //     // Register ok (200)
-        //     Utils.setAuthentication(LoginActivity.this, username, password);
-        //     login();
-        //   }
-        //   @Override
-        //   public void onError(ANError error) {
-        //     error.printStackTrace();
-        //     usernameLoginInput.setError("Failed to register username", null);
-        //     passwordLoginInput.setError("Failed to register password", null);
-        //   }
-        // });
-    // Utils.setAuthentication(LoginActivity.this, username, password);
-    // login();
   }
 
   private void authorizeUser(final String username, final String password) {
@@ -157,10 +138,8 @@ public class LoginActivity extends AppCompatActivity
     } catch (JSONException e) {
       e.printStackTrace();
     }
-    // Utils.setAuthentication(LoginActivity.this, username, password);
-    // login();
+
     AndroidNetworking.post(getString(R.string.api_root)+"user/login")
-        // .addJSONObjectBody(postBody)
         .addBodyParameter("username", username)
         .addBodyParameter("password", password)
         .setTag("postUserLogin")
@@ -178,19 +157,6 @@ public class LoginActivity extends AppCompatActivity
             passwordLoginInput.setError("Failed to authorize password");
           }
         });
-        // .getAsJSONObject(new JSONObjectRequestListener() {
-        //   @Override
-        //   public void onResponse(JSONObject response) {
-        //     // Login ok (200)
-        //     Utils.setAuthentication(LoginActivity.this, username, password);
-        //     login();
-        //   }
-        //   @Override
-        //   public void onError(ANError error) {
-        //     usernameLoginInput.setError("Failed to authorize username");
-        //     passwordLoginInput.setError("Failed to authorize password");
-        //   }
-        // });
   }
 
   private void login() {

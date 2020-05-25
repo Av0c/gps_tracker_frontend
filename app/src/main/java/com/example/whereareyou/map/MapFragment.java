@@ -190,7 +190,7 @@ public class MapFragment extends Fragment
         .getAsJSONArray(new JSONArrayRequestListener() {
           @Override
           public void onResponse(JSONArray response) {
-            Log.d(TAG, "Get locations success: " + response.toString());
+            // Log.d(TAG, "Get locations success: " + response.toString());
             data = response;
             updateMap();
           }
@@ -205,7 +205,7 @@ public class MapFragment extends Fragment
 
   @SuppressLint("SetTextI18n")
   private void updateMap() {
-    Log.d(TAG, "Authentication: " + Utils.getAuthentication(getActivity()));
+    // Log.d(TAG, "Authentication: " + Utils.getAuthentication(getActivity()));
     SimpleDateFormat formatter = new SimpleDateFormat(DATE_TIME_FORMAT, Locale.US);
     Date startDate = new Date();
     Date endDate = new Date();

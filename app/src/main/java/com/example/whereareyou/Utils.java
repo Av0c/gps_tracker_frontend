@@ -43,7 +43,7 @@ public class Utils {
 
   public static void setAuthentication(Context context, String username, String password) {
     String encoded = Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
-    Log.d("MyDebug", "setAuthentication: " + encoded);
+    // Log.d("MyDebug", "setAuthentication: " + encoded);
     PreferenceManager.getDefaultSharedPreferences(context)
         .edit()
         .putString(KEY_AUTHENTICATION, encoded)
