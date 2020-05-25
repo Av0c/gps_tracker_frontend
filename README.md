@@ -40,6 +40,8 @@ This project targets Android API 29, with a minimum of API 26.
 Make sure your Android Studio has the following SDKs installed (*Android Studio > Tools > SDK Manager*):
  - Android 8.0 Oreo (API 26) up to Android 10.0 Q (API 29).
  - Google Play Services (for Google maps).
+ ### Notes:
+Emulator (Android Virtual Device AVD) needs to have its "Graphic" setting set to "Hardware - GLES 2.0" to display Google Maps.
  ## Architecture
 The application contains 2 main activities:
  - LoginActivity - Activity to handle user login/registering.
