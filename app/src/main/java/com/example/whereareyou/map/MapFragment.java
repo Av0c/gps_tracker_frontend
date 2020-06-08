@@ -1,25 +1,22 @@
 package com.example.whereareyou.map;
 
 import android.annotation.SuppressLint;
-import android.app.DatePickerDialog;
-import android.app.Dialog;
-import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.text.format.DateFormat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.TextView;
-import android.widget.TimePicker;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -35,9 +32,11 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -229,7 +228,13 @@ public class MapFragment extends Fragment
     googleMap.clear();
     LatLng lastLoc = new LatLng(0, 0);
     boolean hasData = false;
+
     int currentDataCount = 0;
+
+    // Initiate line options
+    PolylineOptions lineOptions = new PolylineOptions();
+    lineOptions.width(8);
+    lineOptions.color(Color.rgb(2, 174, 174));
 
     for (int i = 0; i < data.length(); i++) {
       Date ts = new Date();
@@ -252,12 +257,19 @@ public class MapFragment extends Fragment
         currentDataCount++;
         // Data is recorded within selected time range
         LatLng loc = new LatLng(latitude, longitude);
-        googleMap.addMarker(new MarkerOptions().position(loc));
+        lineOptions.add(loc);
+        googleMap.addMarker(new MarkerOptions()
+            .position(loc)
+            .anchor(0.5f, 0.5f)
+            .icon(bitmapDescriptorFromVector(getActivity(), R.drawable.ic_dot_12dp))
+        );
         lastLoc = loc;
       }
     }
     if (data.length() > 0) {
       if (hasData) {
+        // Draw path between points
+        googleMap.addPolyline(lineOptions);
         // Move camera to last point of records
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(lastLoc, 6));
       }
@@ -273,5 +285,15 @@ public class MapFragment extends Fragment
         "\nRecords (Current/Total): " + currentDataCount + "/" + data.length() +
           (data.length() <= 0 ? " (Possibly user doesn't exist)" : "")
     );
+  }
+
+  private BitmapDescriptor bitmapDescriptorFromVector(Context context, int vectorResId) {
+    // Get Bitmap for drawing marker from vector image
+    Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResId);
+    vectorDrawable.setBounds(0, 0, vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());
+    Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+    Canvas canvas = new Canvas(bitmap);
+    vectorDrawable.draw(canvas);
+    return BitmapDescriptorFactory.fromBitmap(bitmap);
   }
 }
