@@ -32,16 +32,25 @@ Main features:
 <img src="https://raw.githubusercontent.com/Av0c/gps_tracker_frontend/master/docs/screenshots/map_control.png" width="300">
 
 ## Installation
+
 This project is developed in Android Studio.
-To run, clone this repository and import into Android Studio. Then app can be run on an emulator or a connected device. 
+
+ ### Running instructions
+ - `git clone https://github.com/Av0c/gps_tracker_frontend.git`.
+ - Open project in Android Studio: `File` > `Open` > Navigate to the folder above.
+ - To run the app, make sure you have an Android device connected through USB (USB debug mode) or have setup an AVD (Android Virtual Device). (More details at official guide: [Run your app](https://developer.android.com/training/basics/firstapp/running-app))
+
 It is also possible to build an .apk file to allow installation on another device.
+
  ### Required SDKs
 This project targets Android API 29, with a minimum of API 26.
 Make sure your Android Studio has the following SDKs installed (*Android Studio > Tools > SDK Manager*):
  - Android 8.0 Oreo (API 26) up to Android 10.0 Q (API 29).
  - Google Play Services (for Google maps).
+ 
  ### Notes:
 Emulator (Android Virtual Device AVD) needs to have its "Graphic" setting set to "Hardware - GLES 2.0" to display Google Maps.
+
  ## Architecture
 The application contains 2 main activities:
  - LoginActivity - Activity to handle user login/registering.
