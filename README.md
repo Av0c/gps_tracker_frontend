@@ -26,7 +26,7 @@ Main features:
 <img src="https://raw.githubusercontent.com/Av0c/gps_tracker_frontend/master/docs/screenshots/record.png" width="300">
 
  ### Map screen 
-<img src="https://raw.githubusercontent.com/Av0c/gps_tracker_frontend/master/docs/screenshots/map.png" width="300">
+<img src="https://raw.githubusercontent.com/Av0c/gps_tracker_frontend/master/docs/screenshots/map_with_path.png" width="300">
 
  ### Example datepicker 
 <img src="https://raw.githubusercontent.com/Av0c/gps_tracker_frontend/master/docs/screenshots/map_control.png" width="300">
