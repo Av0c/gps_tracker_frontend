@@ -117,9 +117,14 @@ public class LoginActivity extends AppCompatActivity
         .getAsOkHttpResponse(new OkHttpResponseListener() {
           @Override
           public void onResponse(Response response) {
-            // Log.d(TAG, "onResponse: " + response.toString());
-            Utils.setAuthentication(LoginActivity.this, username, password);
-            login();
+            if (response.code() == 200) {
+              Utils.setAuthentication(LoginActivity.this, username, password);
+              login();
+            }
+            else {
+              usernameLoginInput.setError("Failed to register username", null);
+              passwordLoginInput.setError("Failed to register password", null);
+            }
           }
           @Override
           public void onError(ANError error) {
@@ -148,8 +153,14 @@ public class LoginActivity extends AppCompatActivity
         .getAsOkHttpResponse(new OkHttpResponseListener() {
           @Override
           public void onResponse(Response response) {
-            Utils.setAuthentication(LoginActivity.this, username, password);
-            login();
+            if (response.code() == 200) {
+              Utils.setAuthentication(LoginActivity.this, username, password);
+              login();
+            }
+            else {
+              usernameLoginInput.setError("Failed to authorize username");
+              passwordLoginInput.setError("Failed to authorize password");
+            }
           }
           @Override
           public void onError(ANError anError) {
