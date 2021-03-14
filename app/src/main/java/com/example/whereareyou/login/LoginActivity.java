@@ -17,6 +17,7 @@ import com.example.whereareyou.MainActivity;
 import com.example.whereareyou.R;
 import com.example.whereareyou.Utils;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -28,9 +29,9 @@ public class LoginActivity extends AppCompatActivity
   private static final String TAG = "MyDebug";
   // Components
   private TextInputEditText usernameLoginInput;
+  private TextInputLayout usernameLoginLayout;
   private TextInputEditText passwordLoginInput;
-  private Button buttonLogin;
-  private Button buttonRegister;
+  private TextInputLayout passwordLoginLayout;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -39,9 +40,12 @@ public class LoginActivity extends AppCompatActivity
 
     // Bind inputs
     usernameLoginInput = findViewById(R.id.usernameLoginInput);
+    usernameLoginLayout = findViewById(R.id.usernameLoginLayout);
     passwordLoginInput = findViewById(R.id.passwordLoginInput);
-    buttonLogin = findViewById(R.id.buttonLogin);
-    buttonRegister = findViewById(R.id.buttonRegister);
+    passwordLoginLayout = findViewById(R.id.passwordLoginLayout);
+
+    Button buttonLogin = findViewById(R.id.buttonLogin);
+    Button buttonRegister = findViewById(R.id.buttonRegister);
 
     buttonLogin.setOnClickListener(new View.OnClickListener() {
       @Override
@@ -53,11 +57,11 @@ public class LoginActivity extends AppCompatActivity
 
         if (tryUsername.equals("")) {
           validInputs = false;
-          usernameLoginInput.setError("Username can not be blank");
+          usernameLoginLayout.setError("Username can not be blank");
         }
         if (tryPassword.equals("")) {
           validInputs = false;
-          passwordLoginInput.setError("Password can not be blank");
+          passwordLoginLayout.setError("Password can not be blank");
         }
 
         if (validInputs) {
@@ -76,11 +80,11 @@ public class LoginActivity extends AppCompatActivity
 
         if (tryUsername.equals("")) {
           validInputs = false;
-          usernameLoginInput.setError("Username can not be blank");
+          usernameLoginLayout.setError("Username can not be blank");
         }
         if (tryPassword.equals("")) {
           validInputs = false;
-          passwordLoginInput.setError("Password can not be blank");
+          passwordLoginLayout.setError("Password can not be blank");
         }
 
         if (validInputs) {
@@ -122,15 +126,15 @@ public class LoginActivity extends AppCompatActivity
               login();
             }
             else {
-              usernameLoginInput.setError("Failed to register username", null);
-              passwordLoginInput.setError("Failed to register password", null);
+              usernameLoginLayout.setError("Failed to register username");
+              passwordLoginLayout.setError("Failed to register password");
             }
           }
           @Override
           public void onError(ANError error) {
             error.printStackTrace();
-            usernameLoginInput.setError("Failed to register username", null);
-            passwordLoginInput.setError("Failed to register password", null);
+            usernameLoginLayout.setError("Failed to register username");
+            passwordLoginLayout.setError("Failed to register password");
           }
         });
   }
@@ -158,14 +162,14 @@ public class LoginActivity extends AppCompatActivity
               login();
             }
             else {
-              usernameLoginInput.setError("Failed to authorize username");
-              passwordLoginInput.setError("Failed to authorize password");
+              usernameLoginLayout.setError("Failed to authorize username");
+              passwordLoginLayout.setError("Failed to authorize password");
             }
           }
           @Override
           public void onError(ANError anError) {
-            usernameLoginInput.setError("Failed to authorize username");
-            passwordLoginInput.setError("Failed to authorize password");
+            usernameLoginLayout.setError("Failed to authorize username");
+            passwordLoginLayout.setError("Failed to authorize password");
           }
         });
   }

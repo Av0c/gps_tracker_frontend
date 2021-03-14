@@ -238,15 +238,15 @@ public class MapFragment extends Fragment
 
     for (int i = 0; i < data.length(); i++) {
       Date ts = new Date();
-      int longitude = 0;
-      int latitude = 0;
+      double longitude = 0;
+      double latitude = 0;
       try {
         JSONObject dataPoint = data.getJSONObject(i);
         ts = Objects.requireNonNull(
             formatter.parse(dataPoint.getString("created_at"))
         );
-        latitude = dataPoint.getInt("latitude");
-        longitude = dataPoint.getInt("longitude");
+        latitude = dataPoint.getDouble("latitude");
+        longitude = dataPoint.getDouble("longitude");
       } catch (JSONException | ParseException e) {
         e.printStackTrace();
       }
@@ -282,8 +282,8 @@ public class MapFragment extends Fragment
         "Username: " + username +
         "\nDate: " + dateOnly.format(startDate) +
         "\nTime-range: " + timeOnly.format(startDate) + " - " + timeOnly.format(endDate) +
-        "\nRecords (Current/Total): " + currentDataCount + "/" + data.length() +
-          (data.length() <= 0 ? " (Possibly user doesn't exist)" : "")
+        "\nRecords (Shown/Total): " + currentDataCount + "/" + data.length() +
+          (data.length() <= 0 ? "\n(Possibly user doesn't exist)" : "")
     );
   }
 

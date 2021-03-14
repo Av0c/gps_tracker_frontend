@@ -8,6 +8,7 @@
     android:paddingHorizontal="24dp">
 
     <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/usernameLoginLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -22,9 +23,10 @@
 
 
     <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/passwordLoginLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:passwordToggleEnabled="true">
+        app:endIconMode="password_toggle">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/passwordLoginInput"

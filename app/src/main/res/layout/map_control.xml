@@ -30,7 +30,7 @@
                 android:id="@+id/buttonStartTimePicker"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Pick start time"/>
+                android:text="Start time"/>
         </RelativeLayout>
         <RelativeLayout
             android:layout_width="0dp"
@@ -40,7 +40,7 @@
                 android:id="@+id/buttonEndTimePicker"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Pick end time"/>
+                android:text="End time"/>
         </RelativeLayout>
     </LinearLayout>
 </LinearLayout>
