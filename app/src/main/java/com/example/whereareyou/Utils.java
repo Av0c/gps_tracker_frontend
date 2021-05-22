@@ -16,6 +16,7 @@ public class Utils {
   static final String KEY_REQUESTING_LOCATION_UPDATES = "requesting_location_updates";
   static final String KEY_LOCATION_UPDATE_INTERVAL = "location_update_interval";
   static final String KEY_AUTHENTICATION = "authentication";
+  static final String KEY_API = "api";
 
   public static boolean requestingLocationUpdates(Context context) {
     return PreferenceManager.getDefaultSharedPreferences(context)
@@ -53,5 +54,17 @@ public class Utils {
   public static String getAuthentication(Context context) {
     return PreferenceManager.getDefaultSharedPreferences(context)
         .getString(KEY_AUTHENTICATION, "");
+  }
+
+  public static String getApiRoot(Context context) {
+    return PreferenceManager.getDefaultSharedPreferences(context)
+        .getString(KEY_API, context.getString(R.string.default_api_root));
+  }
+
+  public static void setApiRoot(Context context, String apiString) {
+    PreferenceManager.getDefaultSharedPreferences(context)
+        .edit()
+        .putString(KEY_API, apiString)
+        .apply();
   }
 }

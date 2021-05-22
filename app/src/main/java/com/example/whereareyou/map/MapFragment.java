@@ -19,6 +19,7 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentContainerView;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -35,6 +36,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
@@ -44,6 +46,10 @@ import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -57,7 +63,6 @@ public class MapFragment extends Fragment
 
   // Constants
   public static final int MAP_CONTROL_REQUEST_CODE = 999000;
-  public static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
   // Components
   Button buttonMapControl;
@@ -66,41 +71,22 @@ public class MapFragment extends Fragment
   // Variables
   private JSONArray data = new JSONArray();
   private String username = "";
-  private int year, month, day, startHour, startMinute, endHour, endMinute;
+  private LocalDate startDate;
+  private LocalDate endDate;
+  private LocalTime startTime;
+  private LocalTime endTime;
+
+  private String mapInfoText = "";
 
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
     // Init map controls
-    final Calendar c = Calendar.getInstance();
-    year = c.get(Calendar.YEAR);
-    month = c.get(Calendar.MONTH);
-    day = c.get(Calendar.DAY_OF_MONTH);
-    startHour = 0;
-    startMinute = 0;
-    endHour = 23;
-    endMinute = 59;
-
-    // Init test Json object
-    JSONObject dataPoint1 = new JSONObject();
-    JSONObject dataPoint2 = new JSONObject();
-    try {
-      dataPoint1.put("longitude", 115);
-      dataPoint1.put("latitude", -31);
-      dataPoint1.put("username", "Jason123");
-      dataPoint1.put("created_at", "2020-05-17 01:05:00");
-
-      dataPoint2.put("longitude", 115);
-      dataPoint2.put("latitude", -32);
-      dataPoint2.put("username", "Jason123");
-      dataPoint2.put("created_at", "2020-05-17 01:10:00");
-
-      data.put(dataPoint1);
-      data.put(dataPoint2);
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
+    startDate = LocalDate.now().minusDays(7);
+    endDate = LocalDate.now();
+    startTime = LocalTime.MIN;
+    endTime = LocalTime.parse("23:59");
 
     // Init networking
     AndroidNetworking.initialize(getActivity().getApplicationContext());
@@ -110,16 +96,20 @@ public class MapFragment extends Fragment
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     View view = inflater.inflate(R.layout.map_main, container, false);
-    SupportMapFragment mapFragment = ((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.mapFragment));;
+
+    SupportMapFragment mapFragment = (SupportMapFragment) requireActivity()
+        .getSupportFragmentManager()
+        .findFragmentById(R.id.map);
 
     if (mapFragment == null) {
       FragmentManager fragmentManager = getChildFragmentManager();
       FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
       mapFragment = SupportMapFragment.newInstance();
-      fragmentTransaction.replace(R.id.mapFragment, mapFragment).commit();
+      fragmentTransaction.replace(R.id.map, mapFragment).commit();
     }
 
     mapFragment.getMapAsync(this);
+
     return view;
   }
 
@@ -132,7 +122,7 @@ public class MapFragment extends Fragment
       public void onClick(View view) {
         DialogFragment newFragment = new MapControlFragment(
             username,
-            year, month, day, startHour, startMinute, endHour, endMinute
+            startDate, endDate, startTime, endTime
         );
         newFragment.setTargetFragment(MapFragment.this, MAP_CONTROL_REQUEST_CODE);
         newFragment.show(MapFragment.this.getParentFragmentManager(), "MapControlFragment");
@@ -141,7 +131,7 @@ public class MapFragment extends Fragment
   }
 
   @Override
-  public void onMapReady(GoogleMap readyMap) {
+  public void onMapReady(@NonNull GoogleMap readyMap) {
     googleMap = readyMap;
 
     // Add a marker in Sydney and move the camera
@@ -156,13 +146,10 @@ public class MapFragment extends Fragment
     Bundle bundle = data.getExtras();
     switch (requestCode) {
       case MAP_CONTROL_REQUEST_CODE:
-        year = bundle.getInt("year");
-        month = bundle.getInt("month");
-        day = bundle.getInt("day");
-        startHour = bundle.getInt("startHour");
-        startMinute = bundle.getInt("startMinute");
-        endHour = bundle.getInt("endHour");
-        endMinute = bundle.getInt("endMinute");
+        startDate = LocalDate.parse(bundle.getString("startDate"));
+        endDate = LocalDate.parse(bundle.getString("endDate"));
+        startTime = LocalTime.parse(bundle.getString("startTime"));
+        endTime = LocalTime.parse(bundle.getString("endTime"));
 
         if (!username.equals(bundle.getString("username"))) {
           // Re-fetch data if username changed
@@ -180,7 +167,7 @@ public class MapFragment extends Fragment
 
   private void fetchData(String newUsername) {
     // API call to fetch data of username
-    AndroidNetworking.get(getString(R.string.api_root)+"point/{username}")
+    AndroidNetworking.get(Utils.getApiRoot(getContext()) + "point/{username}")
         .addPathParameter("username", newUsername)
         .addHeaders("Authorization", "Basic " + Utils.getAuthentication(getActivity()))
         .setTag("getPoint")
@@ -204,25 +191,6 @@ public class MapFragment extends Fragment
 
   @SuppressLint("SetTextI18n")
   private void updateMap() {
-    // Log.d(TAG, "Authentication: " + Utils.getAuthentication(getActivity()));
-    SimpleDateFormat formatter = new SimpleDateFormat(DATE_TIME_FORMAT, Locale.US);
-    Date startDate = new Date();
-    Date endDate = new Date();
-    try {
-      startDate = formatter.parse(String.format(
-          Locale.US,
-          "%02d-%02d-%02d %02d:%02d:00",
-          year, month+1, day, startHour, startMinute
-      ));
-      endDate = formatter.parse(String.format(
-          Locale.US,
-          "%02d-%02d-%02d %02d:%02d:00",
-          year, month+1, day, endHour, endMinute
-      ));
-    }
-    catch (ParseException e) {
-      e.printStackTrace();
-    }
 
     // Clear all previous markers
     googleMap.clear();
@@ -237,31 +205,48 @@ public class MapFragment extends Fragment
     lineOptions.color(Color.rgb(2, 174, 174));
 
     for (int i = 0; i < data.length(); i++) {
-      Date ts = new Date();
       double longitude = 0;
       double latitude = 0;
+      LocalDateTime timestamp = null;
       try {
         JSONObject dataPoint = data.getJSONObject(i);
-        ts = Objects.requireNonNull(
-            formatter.parse(dataPoint.getString("created_at"))
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        timestamp = LocalDateTime.parse(
+            dataPoint.getString("created_at"),
+            formatter
         );
         latitude = dataPoint.getDouble("latitude");
         longitude = dataPoint.getDouble("longitude");
-      } catch (JSONException | ParseException e) {
+      } catch (JSONException e) {
         e.printStackTrace();
       }
 
-      if (ts.compareTo(startDate) >= 0
-      && ts.compareTo(endDate) <= 0) {
+      if (timestamp == null) {
+        break;
+      }
+
+      if (
+          (
+              timestamp.toLocalDate().isAfter(startDate)
+              && timestamp.toLocalDate().isBefore(endDate)
+          )
+          && (
+              timestamp.toLocalTime().isAfter(startTime)
+              && timestamp.toLocalTime().isBefore(endTime)
+          )
+      ) {
         hasData = true;
         currentDataCount++;
         // Data is recorded within selected time range
         LatLng loc = new LatLng(latitude, longitude);
         lineOptions.add(loc);
-        googleMap.addMarker(new MarkerOptions()
-            .position(loc)
-            .anchor(0.5f, 0.5f)
-            .icon(bitmapDescriptorFromVector(getActivity(), R.drawable.ic_dot_12dp))
+        googleMap.addMarker(
+            new MarkerOptions()
+                .position(loc)
+                .anchor(0.5f, 0.5f)
+                .icon(bitmapDescriptorFromVector(getActivity(), R.drawable.ic_dot_12dp))
+                .title("Point")
+                .snippet("Recorded at: " + timestamp.toString())
         );
         lastLoc = loc;
       }
@@ -271,20 +256,19 @@ public class MapFragment extends Fragment
         // Draw path between points
         googleMap.addPolyline(lineOptions);
         // Move camera to last point of records
-        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(lastLoc, 6));
+        googleMap.animateCamera(CameraUpdateFactory.newLatLng(lastLoc));
       }
     }
 
     // Update map's information text box
-    SimpleDateFormat dateOnly = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-    SimpleDateFormat timeOnly = new SimpleDateFormat("HH:mm:ss", Locale.US);
-    mapInfoTextView.setText(
-        "Username: " + username +
-        "\nDate: " + dateOnly.format(startDate) +
-        "\nTime-range: " + timeOnly.format(startDate) + " - " + timeOnly.format(endDate) +
+    // SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+    // SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss", Locale.US);
+    mapInfoText = "Username: " + username +
+        "\nDate-range: " + startDate.toString() + " - " + endDate.toString() +
+        "\nTime-range: " + startTime.toString() + " - " + endTime.toString() +
         "\nRecords (Shown/Total): " + currentDataCount + "/" + data.length() +
-          (data.length() <= 0 ? "\n(Possibly user doesn't exist)" : "")
-    );
+        (data.length() <= 0 ? "\n(Possibly user doesn't exist)" : "");
+    mapInfoTextView.setText(mapInfoText);
   }
 
   private BitmapDescriptor bitmapDescriptorFromVector(Context context, int vectorResId) {

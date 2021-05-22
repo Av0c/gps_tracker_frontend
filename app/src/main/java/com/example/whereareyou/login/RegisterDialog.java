@@ -15,7 +15,7 @@ public class RegisterDialog extends DialogFragment {
   private OnRegisterListener listener;
 
   public interface OnRegisterListener {
-    public void onRegister(String username, String password);
+    void onRegister(String username, String password);
   }
 
   RegisterDialog(String username, String password) {

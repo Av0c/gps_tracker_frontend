@@ -236,7 +236,7 @@ public class LocationUpdatesService extends Service {
   private void onNewLocation(final Location location) {
     lastLocation = location;
 
-    AndroidNetworking.post(getString(R.string.api_root)+"point")
+    AndroidNetworking.post(Utils.getApiRoot(getApplicationContext()) + "point")
         .addHeaders("Authorization", "Basic " + Utils.getAuthentication(getApplicationContext()))
         .addBodyParameter("longitude", String.valueOf(location.getLongitude()))
         .addBodyParameter("latitude", String.valueOf(location.getLatitude()))

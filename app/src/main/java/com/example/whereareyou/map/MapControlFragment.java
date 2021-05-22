@@ -1,5 +1,6 @@
 package com.example.whereareyou.map;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -23,11 +24,18 @@ import androidx.fragment.app.FragmentManager;
 import com.example.whereareyou.R;
 import com.google.android.material.textfield.TextInputEditText;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.Calendar;
+import java.util.Locale;
+
 public class MapControlFragment extends DialogFragment {
   private static final String TAG = "MyDebug";
 
   // Fragments communication
-  private static final int DATE_PICKER_REQUEST = 123000;
+  private static final int START_DATE_PICKER_REQUEST = 321001;
+  private static final int END_DATE_PICKER_REQUEST = 321002;
   private static final int START_TIME_PICKER_REQUEST = 123001;
   private static final int END_TIME_PICKER_REQUEST = 123002;
 
@@ -35,28 +43,32 @@ public class MapControlFragment extends DialogFragment {
   private static final int TIME_PICKER_RESULT_CODE = 2;
 
   // Inputs
-  private Button buttonDatePicker;
+  private Button buttonStartDatePicker;
+  private Button buttonEndDatePicker;
   private Button buttonStartTimePicker;
   private Button buttonEndTimePicker;
   private TextInputEditText usernameTextInput;
 
   // Variables
   private AlertDialog mapControlDialog;
-  private String username;
-  private int year, month, day, startHour, startMinute, endHour, endMinute;
+  private final String username;
+  private LocalDate startDate;
+  private LocalDate endDate;
+  private LocalTime startTime;
+  private LocalTime endTime;
 
   MapControlFragment(
       String username,
-      int year, int month, int day, int startHour, int startMinute, int endHour, int endMinute
+      LocalDate startDate,
+      LocalDate endDate,
+      LocalTime startTime,
+      LocalTime endTime
   ) {
     this.username = username;
-    this.year = year;
-    this.month = month;
-    this.day = day;
-    this.startHour = startHour;
-    this.startMinute = startMinute;
-    this.endHour = endHour;
-    this.endMinute = endMinute;
+    this.startDate = startDate;
+    this.endDate = endDate;
+    this.startTime = startTime;
+    this.endTime = endTime;
   }
 
   @NonNull
@@ -77,13 +89,10 @@ public class MapControlFragment extends DialogFragment {
             Intent intent = new Intent(getActivity(), MapFragment.class);
             String username = usernameTextInput.getText().toString();
             intent.putExtra("username", username);
-            intent.putExtra("year", year);
-            intent.putExtra("month", month);
-            intent.putExtra("day", day);
-            intent.putExtra("startHour", startHour);
-            intent.putExtra("startMinute", startMinute);
-            intent.putExtra("endHour", endHour);
-            intent.putExtra("endMinute", endMinute);
+            intent.putExtra("startDate", startDate.toString());
+            intent.putExtra("endDate", endDate.toString());
+            intent.putExtra("startTime", startTime.toString());
+            intent.putExtra("endTime", endTime.toString());
             getTargetFragment().onActivityResult(getTargetRequestCode(), 1, intent);
           }
         })
@@ -119,37 +128,55 @@ public class MapControlFragment extends DialogFragment {
     });
 
     // Set buttons' controller
-    buttonDatePicker = view.findViewById(R.id.buttonDatePicker);
+    buttonStartDatePicker = view.findViewById(R.id.buttonStartDatePicker);
+    buttonEndDatePicker = view.findViewById(R.id.buttonEndDatePicker);
+
     buttonStartTimePicker = view.findViewById(R.id.buttonStartTimePicker);
     buttonEndTimePicker = view.findViewById(R.id.buttonEndTimePicker);
+
     final FragmentManager fm = getParentFragmentManager();
-    buttonDatePicker.setOnClickListener(new View.OnClickListener() {
+
+    buttonStartDatePicker.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
         // Initialize DatePicker
-        DialogFragment newFragment = new DatePickerFragment(year, month, day);
-        newFragment.setTargetFragment(MapControlFragment.this, DATE_PICKER_REQUEST);
-        newFragment.show(fm, "datePicker");
+        DialogFragment newFragment = new DatePickerFragment(startDate);
+        newFragment.setTargetFragment(MapControlFragment.this, START_DATE_PICKER_REQUEST);
+        newFragment.show(fm, "startDatePicker");
       }
     });
+
+    buttonEndDatePicker.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        // Initialize DatePicker
+        DialogFragment newFragment = new DatePickerFragment(endDate);
+        newFragment.setTargetFragment(MapControlFragment.this, END_DATE_PICKER_REQUEST);
+        newFragment.show(fm, "endDatePicker");
+      }
+    });
+
     buttonStartTimePicker.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
         // Initialize TimePicker for Start
-        DialogFragment newFragment = new TimePickerFragment(startHour, startMinute);
+        DialogFragment newFragment = new TimePickerFragment(startTime);
         newFragment.setTargetFragment(MapControlFragment.this, START_TIME_PICKER_REQUEST);
         newFragment.show(fm, "startTimePicker");
       }
     });
+
     buttonEndTimePicker.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
         // Initialize TimePicker for End
-        DialogFragment newFragment = new TimePickerFragment(endHour, endMinute);
+        DialogFragment newFragment = new TimePickerFragment(endTime);
         newFragment.setTargetFragment(MapControlFragment.this, END_TIME_PICKER_REQUEST);
         newFragment.show(fm, "endTimePicker");
       }
     });
+
+    updateDateTimeButtonText();
 
     // Create the AlertDialog object and return it
     return mapControlDialog;
@@ -168,90 +195,99 @@ public class MapControlFragment extends DialogFragment {
   @Override
   public void onActivityResult(int requestCode, int resultCode, Intent data) {
     super.onActivityResult(requestCode, resultCode, data);
+
     Bundle bundle = data.getExtras();
     switch (requestCode) {
-      case DATE_PICKER_REQUEST:
+      case START_DATE_PICKER_REQUEST:
         // Set date
-        year = bundle.getInt("year");
-        month = bundle.getInt("month");
-        day = bundle.getInt("day");
+        startDate = LocalDate.parse(bundle.getString("dateString"));
+        break;
+
+      case END_DATE_PICKER_REQUEST:
+        // Set date
+        endDate = LocalDate.parse(bundle.getString("dateString"));
         break;
 
       case START_TIME_PICKER_REQUEST:
         // Set start time
-        startHour = bundle.getInt("hour");
-        startMinute = bundle.getInt("minute");
-        if (startHour+startMinute/60 > endHour+endMinute/60) {
-          startHour = endHour;
-          startMinute = endMinute;
-        }
+        startTime = LocalTime.parse(bundle.getString("timeString"));
         break;
 
       case END_TIME_PICKER_REQUEST:
         // Set end time
-        endHour = bundle.getInt("hour");
-        endMinute = bundle.getInt("minute");
-        if (endHour+endMinute/60 < startHour+startMinute/60) {
-          endHour = startHour;
-          endMinute = startMinute;
-        }
+        endTime = LocalTime.parse(bundle.getString("timeString"));
         break;
     }
+
+    updateDateTimeButtonText();
+  }
+
+  private void updateDateTimeButtonText() {
+    buttonStartDatePicker.setText(startDate.toString());
+    buttonEndDatePicker.setText(endDate.toString());
+    buttonStartTimePicker.setText(startTime.toString());
+    buttonEndTimePicker.setText(endTime.toString());
   }
 
   // Date/Time picker fragment classes
   public static class TimePickerFragment extends DialogFragment
       implements TimePickerDialog.OnTimeSetListener {
-    private int hour;
-    private int minute;
+    private final LocalTime time;
 
-    TimePickerFragment(int hour, int minute) {
-      this.hour = hour;
-      this.minute = minute;
+    TimePickerFragment(LocalTime time) {
+      this.time = time;
     }
 
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
       // Create a new instance of TimePickerDialog and return it
-      return new TimePickerDialog(getActivity(), this, hour, minute,
-          DateFormat.is24HourFormat(getActivity()));
+      return new TimePickerDialog(
+          getActivity(),
+          this,
+          time.getHour(),
+          time.getMinute(),
+          true
+      );
     }
 
     public void onTimeSet(TimePicker view, int hour, int minute) {
       // Do something with the time chosen by the user
+      LocalTime newTime = LocalTime.of(hour, minute);
+
       Intent intent = new Intent(getActivity(), MapFragment.class);
-      intent.putExtra("hour", hour);
-      intent.putExtra("minute", minute);
+      intent.putExtra("timeString", newTime.toString());
       getTargetFragment().onActivityResult(getTargetRequestCode(), TIME_PICKER_RESULT_CODE, intent);
     }
   }
 
   public static class DatePickerFragment extends DialogFragment
       implements DatePickerDialog.OnDateSetListener {
-    private int year;
-    private int month;
-    private int day;
+    private final LocalDate date;
 
-    DatePickerFragment(int year, int month, int day) {
-      this.year = year;
-      this.month = month;
-      this.day = day;
+    DatePickerFragment(LocalDate date) {
+      this.date = date;
     }
 
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
       // Create a new instance of DatePickerDialog and return it
-      return new DatePickerDialog(getActivity(), this, year, month, day);
+      return new DatePickerDialog(
+          getActivity(),
+          this,
+          date.getYear(),
+          date.getMonthValue() - 1,
+          date.getDayOfMonth()
+      );
     }
 
     public void onDateSet(DatePicker view, int year, int month, int day) {
       // Do something with the date chosen by the user
+      LocalDate newDate = LocalDate.of(year, month + 1, day);
+
       Intent intent = new Intent(getActivity(), MapFragment.class);
-      intent.putExtra("year", year);
-      intent.putExtra("month", month);
-      intent.putExtra("day", day);
+      intent.putExtra("dateString", newDate.toString());
       getTargetFragment().onActivityResult(getTargetRequestCode(), DATE_PICKER_RESULT_CODE, intent);
     }
   }

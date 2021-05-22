@@ -1,74 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:app="http://schemas.android.com/apk/res-auto"
-	android:id="@+id/registerLayout"
-	android:orientation="vertical"
-	android:padding="16dp"
-	android:gravity="center"
-	android:layout_width="match_parent"
-	android:layout_height="match_parent">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/registerLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="16dp">
 
-	<TextView
-		android:id="@+id/tabLabel"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:paddingTop="20dp" />
+    <TextView
+        android:id="@+id/tabLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="20dp" />
 
-	<com.google.android.material.textfield.TextInputLayout
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		app:suffixText="seconds"
-		app:suffixTextColor="@color/colorPrimaryLight"
-		android:textColorHint="@color/colorPrimaryLight"
-		>
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColorHint="@color/colorPrimaryLight"
+        app:suffixText="seconds"
+        app:suffixTextColor="@color/colorPrimaryLight">
 
-		<com.google.android.material.textfield.TextInputEditText
-			android:id="@+id/intervalInput"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:hint="Interval"
-			android:inputType="number"
-			android:text="5"
-			android:textSize="18sp" />
-	</com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/intervalInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Interval"
+            android:inputType="number"
+            android:text="5"
+            android:textSize="18sp" />
+    </com.google.android.material.textfield.TextInputLayout>
 
-	<TextView
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:paddingVertical="14dp"
-		android:paddingHorizontal="6dp"
-		android:text="Notes: To avoid intense memory/battery consumption, avoid setting too small interval"
-		/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="6dp"
+        android:paddingVertical="14dp"
+        android:text="Notes: To avoid intense memory/battery consumption, avoid setting too small interval" />
 
-	<Button
-		android:id="@+id/buttonStart"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:layout_marginBottom="12dp"
-		android:background="@color/colorStart"
-		android:text="START TRACKING"
-		android:textColor="#000" />
+    <Button
+        android:id="@+id/buttonStart"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:background="@color/colorStart"
+        android:text="START TRACKING"
+        android:textColor="#000" />
 
-	<Button
-		android:id="@+id/buttonStop"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:background="@color/colorStop"
-		android:textColor="#fff"
-		android:text="STOP TRACKING" />
+    <Button
+        android:id="@+id/buttonStop"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorStop"
+        android:text="STOP TRACKING"
+        android:textColor="#fff" />
 
-	<LinearLayout
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:layout_weight="1"
-		android:gravity="start|bottom" >
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="start|bottom">
 
-		<Button
-			android:id="@+id/buttonLogout"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="Logout"
-			/>
-	</LinearLayout>
+        <Button
+            android:id="@+id/buttonLogout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Logout" />
+    </LinearLayout>
 
 </LinearLayout>
